@@ -5,11 +5,11 @@ on:
     branches:
       - main
 
-  jobs:
-    test-lint:
-      runs-on: ubuntu-latest
+jobs:
+  test-lint:
+    runs-on: ubuntu-latest
 
-      steps:
+    steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
