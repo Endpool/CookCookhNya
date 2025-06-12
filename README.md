@@ -4,10 +4,8 @@
 
 #### 2. Clone this repo
 
-#### 3. Run git submodule init && git submodule update
+#### 3. Run "git submodule init && git submodule update"
 
 #### 3. Create .env specifying BOT_TOKEN and API_URL in the same directory
 
-#### 4. Copy compose.yaml to the same directory 
-
-#### 5. Run docker compose up --build
+#### 4. Run docker compose up --build
