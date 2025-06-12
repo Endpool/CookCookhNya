@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   backend:
     build:
@@ -8,19 +6,23 @@ services:
     ports:
       - "8080:8080"
     networks:
-      - app-network
+      app-network:
+        aliases:
+          - backend 
 
   frontend:
     build:
       context: ./CookCookhNya-frontend
       dockerfile: Dockerfile
     environment:
-      - BOT_TOKEN=${BOT_TOKEN} # add your personolised token for local development in .env file in the same directory with compose.yml
-      - API_URL=http://backend:8080
+      - BOT_TOKEN=${BOT_TOKEN}
+      - API_URL=${API_URL}
     depends_on:
       - backend
     networks:
-      - app-network
+      app-network:
+        aliases:
+          - frontend
 
 networks:
   app-network:
