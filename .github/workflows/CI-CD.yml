@@ -68,21 +68,13 @@ jobs:
           submodules: true
       
       - name: Deploy to server
-        uses: appleboy/ssh-action@master
-        env:
-          BACKEND_TAG: ${{ github.sha }}
-          FRONTEND_TAG: ${{ github.sha }}
-          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-          API_URL: ${{ secrets.API_URL }}
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /root/app
-            # Debug: Check environment variables
-            echo "BACKEND_TAG=${{ github.sha }}"
-            echo "FRONTEND_TAG=$FRONTEND_TAG"
             echo "BACKEND_TAG=${{ github.sha }}
             FRONTEND_TAG=${{ github.sha }}
             BOT_TOKEN=${{ secrets.BOT_TOKEN }}
