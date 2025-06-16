@@ -80,7 +80,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /root/app
-            cat > /home/rash/app/.env << EOF
+            cat > /root/app/.env << EOF
             BACKEND_TAG=$BACKEND_TAG
             FRONTEND_TAG=$FRONTEND_TAG
             BOT_TOKEN=$BOT_TOKEN
