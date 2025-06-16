@@ -79,6 +79,4 @@ jobs:
             FRONTEND_TAG=${{ github.sha }}
             BOT_TOKEN=${{ secrets.BOT_TOKEN }}
             API_URL=${{ secrets.API_URL }}" > /root/app/.env
-            docker pull j0cos/cookcookhnya-backend:${{ github.sha }}
-            docker pull j0cos/cookcookhnya-frontend:${{ github.sha }}
-            docker-compose -f /root/app/compose.yaml up -d
+            docker-compose down && docker-compose -f /root/app/compose.yaml up -d
