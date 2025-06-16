@@ -80,12 +80,13 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /root/app
-            cat > /root/app/.env << EOF
-            BACKEND_TAG=$BACKEND_TAG
+            # Debug: Check environment variables
+            echo "BACKEND_TAG=$BACKEND_TAG"
+            echo "FRONTEND_TAG=$FRONTEND_TAG"
+            echo "BACKEND_TAG=$BACKEND_TAG
             FRONTEND_TAG=$FRONTEND_TAG
             BOT_TOKEN=$BOT_TOKEN
-            API_URL=$API_URL
-            EOF
+            API_URL=$API_URL" > /root/app/.env
             docker pull j0cos/cookcookhnya-backend:$BACKEND_TAG
             docker pull j0cos/cookcookhnya-frontend:$FRONTEND_TAG
             docker-compose -f /root/app/compose.yaml up -d
