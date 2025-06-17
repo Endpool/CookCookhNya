@@ -80,5 +80,5 @@ jobs:
             echo "BACKEND_TAG=${{ github.sha }}
             FRONTEND_TAG=${{ github.sha }}
             BOT_TOKEN=${{ secrets.BOT_TOKEN }}
-            API_URL=${{ secrets.API_URL }}" > /root/app/.env
+            API_URL=${{ secrets.API_URL }}" > /home/rash/app/.env
             docker compose down && docker compose -f /home/rash/app/compose.yaml up -d
