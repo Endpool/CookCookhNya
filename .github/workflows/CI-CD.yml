@@ -81,4 +81,4 @@ jobs:
             FRONTEND_TAG=${{ github.sha }}
             BOT_TOKEN=${{ secrets.BOT_TOKEN }}
             API_URL=${{ secrets.API_URL }}" > /root/app/.env
-            docker-compose down && docker-compose -f /home/rash/app/compose.yaml up -d
+            docker compose down && docker compose -f /home/rash/app/compose.yaml up -d
