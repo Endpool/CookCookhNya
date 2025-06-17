@@ -72,6 +72,8 @@ jobs:
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
+          port: ${{ secrets.SSH_PORT }}
+          passpharse: ${{ secrets.SSH_PASSPHRASE }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /root/app
