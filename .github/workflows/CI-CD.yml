@@ -17,6 +17,17 @@ jobs:
       - name: Update submodules explicitly
         run: git submodule update --init --recursive
       
+      - name: Cache Conan dependencies
+        uses: actions/cache@v3
+        id: conan-cache
+        with:
+          path: |
+            ~/.conan2
+            /tmp/deps
+          key: ${{ runner.os }}-conan-${{ hashFiles('Frontend/conanfile.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-conan-
+      
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -33,6 +44,7 @@ jobs:
           sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-15 100
           
       - name: Install Conan via pip
+        if: steps.conan-cache.outputs.cache-hit != 'true'
         run: |
           python3 -m pip install --user conan==2.15.1
           echo "$HOME/.local/bin" >> $GITHUB_PATH
@@ -42,11 +54,11 @@ jobs:
         run: |
           mkdir -p $HOME/.conan2/profiles
           conan profile detect --name=default --force
-          # Using C++20 instead of C++23 for compatibility
           sed -i 's/compiler.cppstd=.*/compiler.cppstd=20/' $HOME/.conan2/profiles/default
           cat $HOME/.conan2/profiles/default
       
       - name: Install tgbotstater dependency
+        if: steps.conan-cache.outputs.cache-hit != 'true'
         working-directory: Frontend
         run: |
           mkdir -p /tmp/deps
@@ -57,6 +69,7 @@ jobs:
           conan create . --build=missing -s compiler.cppstd=20
       
       - name: Install project dependencies
+        if: steps.conan-cache.outputs.cache-hit != 'true'
         working-directory: Frontend
         run: |
           conan install . --build=missing -s compiler.cppstd=20
@@ -72,26 +85,26 @@ jobs:
         run: |
           cmake --build --preset=conan-release
       
+      - name: Verify compilation database
+        working-directory: Frontend
+        run: |
+          if [ ! -f build/Release/compile_commands.json ]; then
+            echo "Generating compilation database..."
+            cmake --build --preset=conan-release --target clang-tidy
+          fi
+          ls -la build/Release/compile_commands.json
+      
       - name: Run clang-format checks
         working-directory: Frontend
         run: |
           find src include -type f \( -name '*.hpp' -or -name '*.cpp' \) \
             -exec clang-format-15 --dry-run --Werror {} \;
       
-      - name: Run parallel clang-tidy
+      - name: Run clang-tidy
         working-directory: Frontend
         run: |
-          # First check if compilation database exists
-          if [ ! -f build/Release/compile_commands.json ]; then
-            echo "Error: compile_commands.json not found!"
-            exit 1
-          fi
-          
-          # Run clang-tidy with limited parallel jobs to avoid memory issues
-          find src include \( -name '*.hpp' -or -name '*.cpp' \) -print0 | \
-          parallel -0 -j2 --halt now,fail=1 \
-          'clang-tidy-15 -p build/Release --warnings-as-errors="*" {}'
-
+          cd build/Release
+          run-clang-tidy-15 -j$(nproc) -quiet
         
   build-backend:
     runs-on: ubuntu-latest
