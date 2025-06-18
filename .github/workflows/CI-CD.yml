@@ -36,8 +36,15 @@ jobs:
       - name: Set up Conan profile
         working-directory: Frontend
         run: |
-          conan profile detect --force
+          # Create a new profile with C++23 settings
+          conan profile new --detect --force default
           conan profile update settings.compiler.cppstd=23 default
+          # For Conan 2.x, we need to use this alternative syntax if the above fails
+          conan config set general.default_profile=default
+          echo "settings.compiler.cppstd=23" >> $HOME/.conan2/profiles/default
+      
+      - name: Show Conan profile
+        run: conan profile show default
       
       - name: Install project dependencies
         working-directory: Frontend
@@ -62,7 +69,6 @@ jobs:
           find src include \( -name '*.hpp' -or -name '*.cpp' \) -print0 | \
           parallel -0 -j$(nproc) --halt now,fail=1 \
           'clang-tidy -p build/Release --warnings-as-errors="*" {}'
-
 
         
   build-backend:
