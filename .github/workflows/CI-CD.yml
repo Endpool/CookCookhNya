@@ -26,7 +26,9 @@ jobs:
             parallel \
             python3-pip \
             cmake \
-            build-essential
+            build-essential \
+            wget \
+            tar
           
       - name: Install Conan via pip
         run: |
@@ -36,18 +38,20 @@ jobs:
       - name: Set up Conan profile
         working-directory: Frontend
         run: |
-          # Create profile directory if it doesn't exist
           mkdir -p $HOME/.conan2/profiles
-          
-          # Detect and save profile
           conan profile detect --name=default --force
-          
-          # Manually set C++ standard to 23
           sed -i 's/compiler.cppstd=.*/compiler.cppstd=23/' $HOME/.conan2/profiles/default
-          
-          # Verify the profile
-          echo "Current profile settings:"
           cat $HOME/.conan2/profiles/default
+      
+      - name: Install tgbotstater dependency
+        working-directory: Frontend
+        run: |
+          mkdir -p /tmp/deps
+          cd /tmp/deps
+          wget https://github.com/Makcal/TgBotStater/archive/refs/tags/v0.3.4.tar.gz
+          tar -xvf v0.3.4.tar.gz
+          cd TgBotStater-0.3.4
+          conan create . --build=missing
       
       - name: Install project dependencies
         working-directory: Frontend
