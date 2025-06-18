@@ -21,14 +21,16 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            clang-tidy \
-            clang-format \
+            clang-tidy-15 \
+            clang-format-15 \
             parallel \
             python3-pip \
             cmake \
             build-essential \
             wget \
             tar
+          sudo update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-15 100
+          sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-15 100
           
       - name: Install Conan via pip
         run: |
@@ -40,7 +42,8 @@ jobs:
         run: |
           mkdir -p $HOME/.conan2/profiles
           conan profile detect --name=default --force
-          sed -i 's/compiler.cppstd=.*/compiler.cppstd=23/' $HOME/.conan2/profiles/default
+          # Using C++20 instead of C++23 for compatibility
+          sed -i 's/compiler.cppstd=.*/compiler.cppstd=20/' $HOME/.conan2/profiles/default
           cat $HOME/.conan2/profiles/default
       
       - name: Install tgbotstater dependency
@@ -51,31 +54,43 @@ jobs:
           wget https://github.com/Makcal/TgBotStater/archive/refs/tags/v0.3.4.tar.gz
           tar -xvf v0.3.4.tar.gz
           cd TgBotStater-0.3.4
-          conan create . --build=missing
+          conan create . --build=missing -s compiler.cppstd=20
       
       - name: Install project dependencies
         working-directory: Frontend
         run: |
-          conan install . --build=missing
+          conan install . --build=missing -s compiler.cppstd=20
       
       - name: Configure CMake
         working-directory: Frontend
         run: |
           mkdir -p build/Release
-          cmake --preset=conan-release
+          cmake --preset=conan-release -DCMAKE_CXX_STANDARD=20
+      
+      - name: Build project
+        working-directory: Frontend
+        run: |
+          cmake --build --preset=conan-release
       
       - name: Run clang-format checks
         working-directory: Frontend
         run: |
           find src include -type f \( -name '*.hpp' -or -name '*.cpp' \) \
-            -exec clang-format --dry-run --Werror {} \;
+            -exec clang-format-15 --dry-run --Werror {} \;
       
       - name: Run parallel clang-tidy
         working-directory: Frontend
         run: |
+          # First check if compilation database exists
+          if [ ! -f build/Release/compile_commands.json ]; then
+            echo "Error: compile_commands.json not found!"
+            exit 1
+          fi
+          
+          # Run clang-tidy with limited parallel jobs to avoid memory issues
           find src include \( -name '*.hpp' -or -name '*.cpp' \) -print0 | \
-          parallel -0 -j$(nproc) --halt now,fail=1 \
-          'clang-tidy -p build/Release --warnings-as-errors="*" {}'
+          parallel -0 -j2 --halt now,fail=1 \
+          'clang-tidy-15 -p build/Release --warnings-as-errors="*" {}'
 
         
   build-backend:
