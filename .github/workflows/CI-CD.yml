@@ -36,15 +36,18 @@ jobs:
       - name: Set up Conan profile
         working-directory: Frontend
         run: |
-          # Create a new profile with C++23 settings
-          conan profile new --detect --force default
-          conan profile update settings.compiler.cppstd=23 default
-          # For Conan 2.x, we need to use this alternative syntax if the above fails
-          conan config set general.default_profile=default
-          echo "settings.compiler.cppstd=23" >> $HOME/.conan2/profiles/default
-      
-      - name: Show Conan profile
-        run: conan profile show default
+          # Create profile directory if it doesn't exist
+          mkdir -p $HOME/.conan2/profiles
+          
+          # Detect and save profile
+          conan profile detect --name=default --force
+          
+          # Manually set C++ standard to 23
+          sed -i 's/compiler.cppstd=.*/compiler.cppstd=23/' $HOME/.conan2/profiles/default
+          
+          # Verify the profile
+          echo "Current profile settings:"
+          cat $HOME/.conan2/profiles/default
       
       - name: Install project dependencies
         working-directory: Frontend
