@@ -16,7 +16,7 @@ services:
       dockerfile: Dockerfile
     environment:
       - BOT_TOKEN=${BOT_TOKEN}
-      - API_URL=${API_URL}
+      - API_URL=http://backend:8080
     depends_on:
       - backend
     networks:
