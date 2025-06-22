@@ -29,6 +29,7 @@ jobs:
           context: ./Backend
           push: true
           tags: j0cos/cookcookhny-backend:${{ github.sha }}
+
         
   build-frontend:
     runs-on: ubuntu-latest
@@ -55,6 +56,7 @@ jobs:
           context: ./Frontend
           push: true
           tags: j0cos/cookcookhny-frontend:${{ github.sha }}
+
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -84,4 +86,5 @@ jobs:
             DB_NAME=${{ secrets.DB_NAME }}
             DB_USER=${{ secrets.DB_USER }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}" > /home/rash/app/.env
+
             docker compose down && docker compose -f /home/rash/app/compose.yaml up -d
