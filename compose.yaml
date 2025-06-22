@@ -1,18 +1,42 @@
+version: '3.8'
+
 services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   backend:
-    build:
+    build: 
       context: ./Backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile 
     ports:
       - "8080:8080"
+    environment:
+      DB_ADDRESS: db:5432
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+    depends_on:
+      db:
+        condition: service_healthy
     networks:
       app-network:
         aliases:
-          - backend 
+          - backend
 
   frontend:
     build:
-      context: ./Frontend
+      context:  ./Frontend
       dockerfile: Dockerfile
     environment:
       - BOT_TOKEN=${BOT_TOKEN}
