@@ -1,4 +1,4 @@
-# Instructions for local development
+# Instructions for local development.
 
 #### 1. Create a new directory
 
