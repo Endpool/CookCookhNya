@@ -18,11 +18,12 @@ jobs:
       - name: Update submodules explicitly
         run: |
           git submodule update --init --recursive
+          cd Backend && git branch --all && cd ..
           # Set submodule branches based on the main repo branch
           if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-            git submodule foreach 'git checkout main && git pull origin main'
+            git submodule foreach 'git pull origin main'
           elif [ "${{ github.ref }}" = "refs/heads/dev" ]; then
-            git submodule foreach 'git checkout dev && git pull origin dev'
+            git submodule foreach 'git pull origin dev'
           fi
     
       - name: Log in to Docker Hub
