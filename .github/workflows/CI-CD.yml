@@ -17,17 +17,17 @@ jobs:
         with:
           submodules: true
     
-      - name: Update submodules explicitly
-        if: github.ref == 'refs/heads/dev'
-        run: |
-          git submodule update --init --recursive
-          git submodule update --remote
-          # Set submodule branches based on the main repo branch
-          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-            git submodule foreach 'git fetch --all && git checkout main && git pull origin main'
-          elif [ "${{ github.ref }}" = "refs/heads/dev" ]; then
-            git submodule foreach 'git fetch --all && git checkout dev  && git pull origin dev'
-          fi
+      # - name: Update submodules explicitly
+      #   if: github.ref == 'refs/heads/dev'
+      #   run: |
+      #     git submodule update --init --recursive
+      #     git submodule update --remote
+      #     # Set submodule branches based on the main repo branch
+      #     if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+      #       git submodule foreach 'git fetch --all && git checkout main && git pull origin main'
+      #     elif [ "${{ github.ref }}" = "refs/heads/dev" ]; then
+      #       git submodule foreach 'git fetch --all && git checkout dev  && git pull origin dev'
+      #     fi
     
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -51,16 +51,16 @@ jobs:
         with:
           submodules: true
     
-      - name: Update submodules explicitly
-        if: github.ref == 'refs/heads/dev'
-        run: |
-          git submodule update --init --recursive
-          # Set submodule branches based on the main repo branch
-          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-            git submodule foreach 'git checkout main && git pull origin main'
-          elif [ "${{ github.ref }}" = "refs/heads/dev" ]; then
-            git submodule foreach 'git checkout dev && git pull origin dev'
-          fi
+      # - name: Update submodules explicitly
+      #   if: github.ref == 'refs/heads/dev'
+      #   run: |
+      #     git submodule update --init --recursive
+      #     # Set submodule branches based on the main repo branch
+      #     if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+      #       git submodule foreach 'git checkout main && git pull origin main'
+      #     elif [ "${{ github.ref }}" = "refs/heads/dev" ]; then
+      #       git submodule foreach 'git checkout dev && git pull origin dev'
+      #     fi
   
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -92,11 +92,11 @@ jobs:
         with:
           submodules: true
       
-      - name: Update submodules explicitly
-        if: github.ref == 'refs/heads/dev'
-        run: |
-          git submodule update --init --recursive
-          git submodule foreach 'git checkout main && git pull origin main'
+      # - name: Update submodules explicitly
+      #   if: github.ref == 'refs/heads/dev'
+      #   run: |
+      #     git submodule update --init --recursive
+      #     git submodule foreach 'git checkout main && git pull origin main'
       
       - name: Deploy to production server
         uses: appleboy/ssh-action@v1.0.3
@@ -126,10 +126,10 @@ jobs:
         with:
           submodules: true
       
-      - name: Update submodules explicitly
-        run: |
-          git submodule update --init --recursive
-          git submodule foreach 'git checkout dev && git pull origin dev'
+      # - name: Update submodules explicitly
+      #   run: |
+      #     git submodule update --init --recursive
+      #     git submodule foreach 'git checkout dev && git pull origin dev'
       
       - name: Deploy to staging server
         uses: appleboy/ssh-action@v1.0.3
