@@ -16,6 +16,7 @@ jobs:
           submodules: true
     
       - name: Update submodules explicitly
+        if: github.ref == 'refs/heads/dev'
         run: |
           git submodule update --init --recursive
           git submodule update --remote
@@ -48,6 +49,7 @@ jobs:
           submodules: true
     
       - name: Update submodules explicitly
+        if: github.ref == 'refs/heads/dev'
         run: |
           git submodule update --init --recursive
           # Set submodule branches based on the main repo branch
@@ -88,6 +90,7 @@ jobs:
           submodules: true
       
       - name: Update submodules explicitly
+        if: github.ref == 'refs/heads/dev'
         run: |
           git submodule update --init --recursive
           git submodule foreach 'git checkout main && git pull origin main'
