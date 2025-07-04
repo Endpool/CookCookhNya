@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - dev
 
 jobs:      
   build-backend:
@@ -79,27 +78,3 @@ jobs:
             DB_USER=${{ secrets.DB_USER }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}" > /home/rash/app/.env
             docker compose down && docker compose -f /home/rash/app/compose.yaml up -d
-
-  deploy-staging:
-    if: github.ref == 'refs/heads/dev'
-    runs-on: ubuntu-latest
-    needs: [build-backend, build-frontend]
-    steps:
-      - name: Deploy to staging server
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          port: ${{ secrets.SSH_PORT }}
-          passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            cd /home/rash/app-stage
-            echo "BACKEND_TAG=${{ github.sha }}
-            FRONTEND_TAG=${{ github.sha }}
-            BOT_TOKEN=${{ secrets.BOT_TOKEN_STAGE }}
-            API_URL=http://backend:8080
-            DB_NAME=${{ secrets.DB_NAME }}
-            DB_USER=${{ secrets.DB_USER }}
-            DB_PASSWORD=${{ secrets.DB_PASSWORD }}" > /home/rash/app-stage/.env
-            docker compose down && docker compose -f /home/rash/app-stage/compose.yaml up -d
