@@ -18,6 +18,7 @@ jobs:
       - name: Update submodules explicitly
         run: |
           git submodule update --init --recursive
+          git submodule update --remote
           # Set submodule branches based on the main repo branch
           if [ "${{ github.ref }}" = "refs/heads/main" ]; then
             git submodule foreach 'git fetch --all && git checkout main && git pull origin main'
