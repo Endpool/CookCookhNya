@@ -8,6 +8,7 @@ on:
 
 jobs:      
   build-backend:
+    if: github.repository_owner == 'Endpool'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -41,6 +42,7 @@ jobs:
           tags: j0cos/cookcookhny-backend:${{ github.sha }}
 
   build-frontend:
+    if: github.repository_owner == 'Endpool'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -80,7 +82,7 @@ jobs:
           cache-to: type=gha,mode=max
 
   deploy-production:
-    if: github.ref == 'refs/heads/main'
+    if: github.repository_owner == 'Endpool' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     needs: [build-backend, build-frontend]
     steps:
@@ -114,7 +116,7 @@ jobs:
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}" > /home/rash/app/.env
             docker compose down && docker compose -f /home/rash/app/compose.yaml up -d
   deploy-staging:
-    if: github.ref == 'refs/heads/dev'
+    if: github.repository_owner == 'Endpool' && github.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
     needs: [build-backend, build-frontend]
     steps:
