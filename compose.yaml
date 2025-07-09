@@ -16,9 +16,9 @@ services:
       retries: 5
 
   backend:
-    build: 
+    build:
       context: ./Backend
-      dockerfile: Dockerfile 
+      dockerfile: Dockerfile
     ports:
       - "8080:8080"
     environment:
@@ -26,6 +26,7 @@ services:
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
+      INVITATIONS_SECRET_KEY: ${INVITATIONS_SECRET_KEY}
     depends_on:
       db:
         condition: service_healthy
