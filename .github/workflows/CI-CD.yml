@@ -115,7 +115,7 @@ jobs:
             DB_NAME=${{ secrets.DB_NAME }}
             DB_USER=${{ secrets.DB_USER }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-            INVITATIONS_SECRET_KEY=${{ secrets.INVITATIONS_SECRET_KEY }}> /home/rash/app/.env
+            INVITATIONS_SECRET_KEY=${{ secrets.INVITATIONS_SECRET_KEY }}" > /home/rash/app/.env
             docker compose down && docker compose -f /home/rash/app/compose.yaml up -d
   deploy-staging:
     if: github.repository_owner == 'Endpool' && github.ref == 'refs/heads/dev'
@@ -149,5 +149,5 @@ jobs:
             DB_NAME=${{ secrets.DB_NAME }}
             DB_USER=${{ secrets.DB_USER }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-            INVITATIONS_SECRET_KEY=${{ secrets.INVITATIONS_SECRET_KEY }}> /home/rash/app-stage/.env
+            INVITATIONS_SECRET_KEY=${{ secrets.INVITATIONS_SECRET_KEY }}" > /home/rash/app-stage/.env
             docker compose down && docker compose -f /home/rash/app-stage/compose.yaml up -d
