@@ -19,7 +19,7 @@ jobs:
     if: github.repository_owner == 'Endpool'
     strategy:
       matrix:
-        component: [backend, frontend]
+        component: ['backend', 'frontend']
     runs-on: ubuntu-latest
     steps:
       - name: Checkout with adaptive submodules
@@ -50,7 +50,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: ./${{ matrix.component | capitalize }}
+          context: ./${{ matrix.component == 'backend' && 'Backend' || 'Frontend' }}
           push: true
           tags: j0cos/cookcookhny-${{ matrix.component }}:${{ github.sha }}
           cache-from: ${{ matrix.component == 'frontend' && 'type=gha' || '' }}
