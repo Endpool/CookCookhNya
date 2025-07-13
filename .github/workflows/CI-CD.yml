@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       branch_name: ${{ steps.branch.outputs.value }}
+      is_production: ${{ github.ref == 'refs/heads/main' }}
     steps:
       - name: Extract branch name
         id: branch
@@ -29,16 +30,13 @@ jobs:
 
       - name: Clone submodules directly
         run: |
-          # Get the current branch name
           BRANCH="${{ needs.prepare.outputs.branch_name }}"
           
-          # Clone backend submodule
           git clone -b $BRANCH --depth 1 \
             https://github.com/Endpool/CookCookhNya-backend Backend || \
             git clone -b main --depth 1 \
             https://github.com/Endpool/CookCookhNya-backend Backend
           
-          # Clone frontend submodule
           git clone -b $BRANCH --depth 1 \
             https://github.com/Endpool/CookCookhNya-frontend Frontend || \
             git clone -b main --depth 1 \
@@ -77,13 +75,17 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
-            ENV_DIR="/home/rash/${{ github.ref == 'refs/heads/main' && 'app' || 'app-stage' }}"
+            # Set environment variables
+            IS_PROD=${{ needs.prepare.outputs.is_production }}
+            ENV_DIR="/home/rash/$([ "$IS_PROD" = "true" ] && echo "app" || echo "app-stage")"
+            API_PORT=$([ "$IS_PROD" = "true" ] && echo "8080" || echo "8081")
+            
             cd $ENV_DIR
             
             echo "BACKEND_TAG=${{ github.sha }}
             FRONTEND_TAG=${{ github.sha }}
-            BOT_TOKEN=${{ github.ref == 'refs/heads/main' && secrets.BOT_TOKEN || secrets.BOT_TOKEN_STAGE }}
-            API_URL=http://backend:8080
+            BOT_TOKEN=$([ "$IS_PROD" = "true" ] && echo "${{ secrets.BOT_TOKEN }}" || echo "${{ secrets.BOT_TOKEN_STAGE }}")
+            API_URL=http://backend:$API_PORT
             DB_NAME=${{ secrets.DB_NAME }}
             DB_USER=${{ secrets.DB_USER }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
