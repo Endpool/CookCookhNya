@@ -22,16 +22,13 @@ jobs:
         component: ['backend', 'frontend']
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout with adaptive submodules
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
           submodules: recursive
-          token: ${{ secrets.GH_TOKEN }}
-          ref: ${{ github.ref }}
 
       - name: Configure submodule branches
         run: |
-          # Set submodule branches to match root repo branch
           git config -f .gitmodules submodule.Backend.branch ${{ needs.prepare.outputs.branch_name }}
           git config -f .gitmodules submodule.Frontend.branch ${{ needs.prepare.outputs.branch_name }}
           git submodule sync
