@@ -22,36 +22,27 @@ jobs:
         component: ['backend', 'frontend']
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout root repository
         uses: actions/checkout@v4
         with:
-          submodules: true
+          submodules: false
 
-      - name: Safe submodule branch switch
+      - name: Clone submodules directly
         run: |
-          # Verify branch exists before switching
-          cd Backend
-          if git ls-remote --heads origin ${{ needs.prepare.outputs.branch_name }} | grep -q "refs/heads/${{ needs.prepare.outputs.branch_name }}"; then
-            echo "Branch exists in Backend submodule"
-            cd ..
-            git config -f .gitmodules submodule.Backend.branch ${{ needs.prepare.outputs.branch_name }}
-          else
-            echo "Using default branch for Backend submodule"
-            cd ..
-          fi
-
-          cd Frontend
-          if git ls-remote --heads origin ${{ needs.prepare.outputs.branch_name }} | grep -q "refs/heads/${{ needs.prepare.outputs.branch_name }}"; then
-            echo "Branch exists in Frontend submodule"
-            cd ..
-            git config -f .gitmodules submodule.Frontend.branch ${{ needs.prepare.outputs.branch_name }}
-          else
-            echo "Using default branch for Frontend submodule"
-            cd ..
-          fi
-
-          git submodule sync
-          git submodule update --init --recursive --remote
+          # Get the current branch name
+          BRANCH="${{ needs.prepare.outputs.branch_name }}"
+          
+          # Clone backend submodule
+          git clone -b $BRANCH --depth 1 \
+            https://github.com/Endpool/CookCookhNya-backend Backend || \
+            git clone -b main --depth 1 \
+            https://github.com/Endpool/CookCookhNya-backend Backend
+          
+          # Clone frontend submodule
+          git clone -b $BRANCH --depth 1 \
+            https://github.com/Endpool/CookCookhNya-frontend Frontend || \
+            git clone -b main --depth 1 \
+            https://github.com/Endpool/CookCookhNya-frontend Frontend
 
       - name: Docker login
         uses: docker/login-action@v3
