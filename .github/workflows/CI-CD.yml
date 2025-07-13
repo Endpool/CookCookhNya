@@ -25,12 +25,31 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          submodules: recursive
+          submodules: true
 
-      - name: Configure submodule branches
+      - name: Safe submodule branch switch
         run: |
-          git config -f .gitmodules submodule.Backend.branch ${{ needs.prepare.outputs.branch_name }}
-          git config -f .gitmodules submodule.Frontend.branch ${{ needs.prepare.outputs.branch_name }}
+          # Verify branch exists before switching
+          cd Backend
+          if git ls-remote --heads origin ${{ needs.prepare.outputs.branch_name }} | grep -q "refs/heads/${{ needs.prepare.outputs.branch_name }}"; then
+            echo "Branch exists in Backend submodule"
+            cd ..
+            git config -f .gitmodules submodule.Backend.branch ${{ needs.prepare.outputs.branch_name }}
+          else
+            echo "Using default branch for Backend submodule"
+            cd ..
+          fi
+
+          cd Frontend
+          if git ls-remote --heads origin ${{ needs.prepare.outputs.branch_name }} | grep -q "refs/heads/${{ needs.prepare.outputs.branch_name }}"; then
+            echo "Branch exists in Frontend submodule"
+            cd ..
+            git config -f .gitmodules submodule.Frontend.branch ${{ needs.prepare.outputs.branch_name }}
+          else
+            echo "Using default branch for Frontend submodule"
+            cd ..
+          fi
+
           git submodule sync
           git submodule update --init --recursive --remote
 
