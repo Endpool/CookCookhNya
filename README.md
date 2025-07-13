@@ -7,7 +7,7 @@
 git submodule init && git submodule update
 ```
 4. Create a bot at [@BotFather](https://t.me/BotFather) (don't forget to enable inline mode in settings)
-5. Create `.env` specifying `BOT_TOKEN` in same directory
+5. Create `.env` specifying `BOT_TOKEN` in the same directory
 6. Run
 ```bash
 docker compose up --build
