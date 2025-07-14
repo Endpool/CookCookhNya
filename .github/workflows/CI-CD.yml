@@ -78,14 +78,14 @@ jobs:
             # Set environment variables
             IS_PROD=${{ needs.prepare.outputs.is_production }}
             ENV_DIR="/home/rash/$([ "$IS_PROD" = "true" ] && echo "app" || echo "app-stage")"
-            API_PORT=$([ "$IS_PROD" = "true" ] && echo "8080" || echo "8081")
+            
             
             cd $ENV_DIR
             
             echo "BACKEND_TAG=${{ github.sha }}
             FRONTEND_TAG=${{ github.sha }}
             BOT_TOKEN=$([ "$IS_PROD" = "true" ] && echo "${{ secrets.BOT_TOKEN }}" || echo "${{ secrets.BOT_TOKEN_STAGE }}")
-            API_URL=http://backend:$API_PORT
+            API_URL=http://backend:8080
             DB_NAME=${{ secrets.DB_NAME }}
             DB_USER=${{ secrets.DB_USER }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
