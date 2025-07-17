@@ -89,7 +89,10 @@ jobs:
             DB_NAME=${{ secrets.DB_NAME }}
             DB_USER=${{ secrets.DB_USER }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-            INVITATIONS_SECRET_KEY=${{ secrets.INVITATIONS_SECRET_KEY }}" > .env
+            INVITATIONS_SECRET_KEY=${{ secrets.INVITATIONS_SECRET_KEY }}
+            WEBHOOK_PORT=8443
+            WEBHOOK_HOST=${{ secrets.WEBHOOK_HOST }}
+            WEBHOOK_SECRET=${{ secrets.WEBHOOK_SECRET }}" > .env
             
             docker compose down
             docker compose up -d
