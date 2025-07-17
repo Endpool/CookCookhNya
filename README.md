@@ -1,6 +1,6 @@
 # Instructions for local development
 
-1. Create a new directory.
+1. Create a new directory
 2. Clone this repo
 3. Run
 ```bash
