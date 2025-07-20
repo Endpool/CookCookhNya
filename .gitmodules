@@ -1,8 +1,8 @@
 [submodule "CookCookhNya-backend"]
 	path = Backend
-    branch = dev
+    branch = main
 	url = https://github.com/Endpool/CookCookhNya-backend
 [submodule "CookCookhNya-frontend"]
     path = Frontend
-    branch = dev
+    branch = main
 	url = https://github.com/Endpool/CookCookhNya-frontend
