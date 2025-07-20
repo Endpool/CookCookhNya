@@ -8,7 +8,7 @@
   </a>
 </p>
 
-> **CookCookhNya** is an innovative Telegram-based cooking assistant that transforms the way you cook by suggesting recipes based on the ingredients you already have at home. Say goodbye to the frustration of staring into your fridge, wondering what to make—CookCookhNya helps you whip up delicious meals while minimizing food waste. Perfect for students, busy professionals, and home cooks alike!
+> **CookCookhNya** is an innovative Telegram-based cooking assistant that transforms the way you cook by suggesting recipes based on the ingredients you already have at home. Say goodbye to the frustration of staring into your fridge, wondering what to make — CookCookhNya helps you whip up delicious meals while minimizing food waste. Perfect for students, busy professionals, and home cooks alike!
 ---
 
 ## 🌟 Project Overview
