@@ -1,0 +1,153 @@
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://loki:3100/loki/api/v1/push"
+        loki-external-labels: "service=db,project=app"
+
+  backend:
+    image: j0cos/cookcookhny-backend:${BACKEND_TAG}
+    ports:
+      - "5018:8080"
+    environment:
+      DB_ADDRESS: db:5432
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      INVITATIONS_SECRET_KEY: ${INVITATIONS_SECRET_KEY}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://loki:3100/loki/api/v1/push"
+        loki-external-labels: "service=backend,project=app"
+
+  frontend:
+    image: j0cos/cookcookhny-frontend:${FRONTEND_TAG}
+    ports:
+      - "8443:8443"
+    environment:
+      BOT_TOKEN: ${BOT_TOKEN}
+      API_URL: http://backend:8080
+      WEBHOOK_PORT: 8443
+      WEBHOOK_HOST: ${WEBHOOK_HOST}
+      WEBHOOK_SECRET: ${WEBHOOK_SECRET}
+    command: --webhook
+    depends_on:
+      - backend
+    networks:
+      - app-network
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://loki:3100/loki/api/v1/push"
+        loki-external-labels: "service=frontend,project=app"
+
+  loki:
+    image: grafana/loki:latest
+    ports:
+      - "3100:3100"
+    networks:
+      - app-network
+    depends_on:
+      - db
+      - backend
+      - frontend
+
+  promtail:
+    image: grafana/promtail:latest
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./promtail-config.yaml:/etc/promtail/config.yaml
+    command: -config.file=/etc/promtail/config.yaml -config.expand-env=true
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    privileged: true
+    networks:
+      - app-network
+    depends_on:
+      - loki
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - app-network
+    depends_on:
+      - db
+      - backend
+      - frontend
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    ports:
+      - "8082:8080"
+    networks:
+      - app-network
+    depends_on:
+      - db
+      - backend
+      - frontend
+
+  postgres-exporter:
+    image: wrouesnel/postgres_exporter
+    environment:
+      DATA_SOURCE_NAME: "postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?sslmode=disable"
+    networks:
+      - app-network
+    depends_on:
+      db:
+        condition: service_healthy
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "5011:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    environment:
+      - GF_LOG_LEVEL=info
+    networks:
+      - app-network
+    depends_on:
+      - loki
+      - prometheus
+      - postgres-exporter
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  db-data:
+  grafana-storage:
+  prometheus-data:

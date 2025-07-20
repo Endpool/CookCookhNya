@@ -1,5 +1,4 @@
-version: '3.8'
-
+rash@maxim1 ~/app-stage % cat compose.yaml
 services:
   db:
     image: postgres:17
@@ -7,6 +6,8 @@ services:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db-data-stage:/var/lib/postgresql/data
     networks:
       - app-network
     healthcheck:
@@ -16,38 +17,37 @@ services:
       retries: 5
 
   backend:
-    build: 
-      context: ./Backend
-      dockerfile: Dockerfile 
+    image: j0cos/cookcookhny-backend:${BACKEND_TAG}
     ports:
-      - "8080:8080"
+      - "8081:8080"
     environment:
       DB_ADDRESS: db:5432
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
+      INVITATIONS_SECRET_KEY: ${INVITATIONS_SECRET_KEY}
     depends_on:
       db:
         condition: service_healthy
     networks:
-      app-network:
-        aliases:
-          - backend
+      - app-network
 
   frontend:
-    build:
-      context:  ./Frontend
-      dockerfile: Dockerfile
+    image: j0cos/cookcookhny-frontend:${FRONTEND_TAG}
     environment:
-      - BOT_TOKEN=${BOT_TOKEN}
-      - API_URL=http://backend:8080
+      BOT_TOKEN:
+      API_URL: http://backend:8080
+      WEBHOOK_PORT: 8443
+      WEBHOOK_HOST: 
+      WEBHOOK_SECRET: 
     depends_on:
       - backend
     networks:
-      app-network:
-        aliases:
-          - frontend
+      - app-network
 
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  db-data-stage:
