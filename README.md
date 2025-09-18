@@ -1,7 +1,7 @@
 # Instructions for local development
 
 1. Create a new directory
-2. Clone this repo
+2. Clone this repo.
 3. Run
 ```bash
 git submodule init && git submodule update --remote
